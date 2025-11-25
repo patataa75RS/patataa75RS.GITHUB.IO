@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Escape Room - Revelación de Sexo</title>
+  <style>
+    /* Palette pastel: rosa, azul, blanco y verde */
+    :root{
+      --bg-1: #f7fbff; /* very pale blue */
+      --bg-2: #fffafc; /* very pale pink */
+      --card: rgba(255,255,255,0.85);
+      --glass: rgba(255,255,255,0.7);
+      --accent-blue: #a7d8ff;
+      --accent-pink: #ffd1e3;
+      --accent-green: #c8f7e6;
+      --accent-yellow: #fff4c2;
+      --muted: #7b8794;
+      --text-dark: #102028;
+    }
+    *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:var(--text-dark)}
+
+    /* soft cloud background */
+    body::before{content:'';position:fixed;left:0;top:0;width:100%;height:100%;background-image:radial-gradient(circle at 10% 20%, rgba(167,216,255,0.25) 0 8%, transparent 9%), radial-gradient(circle at 80% 70%, rgba(255,209,227,0.22) 0 10%, transparent 11%);pointer-events:none}
+
+    .wrap{max-width:1100px;margin:24px auto;padding:22px}
+    header{display:flex;align-items:center;gap:18px}
+
+    .logo{width:76px;height:76px;border-radius:18px;background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--text-dark);box-shadow:0 8px 20px rgba(16,32,40,0.06)}
+    h1{margin:0;font-size:26px}
+    p.lead{margin:6px 0 18px;color:var(--muted)}
+
+    .board{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-top:12px}
+    .card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(16,32,40,0.06);border:1px solid rgba(16,32,40,0.04)}
+    .left .card{min-height:560px}
+
+    .hint{background:var(--glass);padding:12px;border-radius:10px;margin-bottom:12px;color:var(--text-dark)}
+
+    .puzzle{margin-bottom:14px;padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.95));}
+    .puzzle h3{margin:0 0 8px}
+    .puzzle .controls{display:flex;gap:8px;flex-wrap:wrap}
+
+    input[type=text], input[type=number], .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(16,32,40,0.06);outline:none}
+    input[type=text]{min-width:220px;background:transparent;color:var(--text-dark)}
+    .btn{background:linear-gradient(90deg,var(--accent-green),var(--accent-blue));cursor:pointer;color:var(--text-dark);font-weight:700}
+    .btn.secondary{background:linear-gradient(90deg,var(--accent-pink),var(--accent-yellow));color:var(--text-dark)}
+
+    .lock{font-family:monospace;background:rgba(16,32,40,0.04);padding:8px;border-radius:8px;color:var(--text-dark);display:inline-block}
+
+    /* Balloons ordering pastel */
+    .balloons{display:flex;gap:10px;align-items:flex-end;padding:12px}
+    .balloon{width:62px;height:98px;border-radius:36px 36px 30px 30px;display:flex;align-items:center;justify-content:center;color:var(--text-dark);cursor:pointer;user-select:none;box-shadow:0 6px 18px rgba(16,32,40,0.06);font-weight:700}
+    .balloon.blue{background:linear-gradient(180deg,var(--accent-blue),#87c9ff)}
+    .balloon.pink{background:linear-gradient(180deg,var(--accent-pink),#ffc1df)}
+    .balloon.green{background:linear-gradient(180deg,var(--accent-green),#aef0d8)}
+    .balloon.yellow{background:linear-gradient(180deg,var(--accent-yellow),#fff1a8)}
+
+    /* Slider puzzle */
+    .sliderRow{display:flex;gap:8px;align-items:center}
+    .piece{width:60px;height:60px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(240,240,240,0.9));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--text-dark);border:1px solid rgba(16,32,40,0.04)}
+
+    /* baby decor */
+    .baby-strip{display:flex;gap:8px;align-items:center;justify-content:center;padding:12px}
+    .baby-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue));box-shadow:0 6px 20px rgba(16,32,40,0.06)}
+    .decor-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+
+    .reveal{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px}
+    .reveal h2{font-size:28px;margin:6px 0}
+    .confetti{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+
+    @media (max-width:980px){.board{grid-template-columns:1fr}.wrap{padding:12px}}
+  </style>
+</head>
+<body>
+  <div class="confetti" id="confetti"></div>
+  <div class="wrap">
+    <header>
+      <div class="logo">👶</div>
+      <div>
+        <h1>Escape Room · Revelación de Sexo</h1>
+        <p class="lead">Resuelve las 4 pruebas decoradas con tonos pastel para descubrir si es <strong>niño (Oliver)</strong> o <strong>niña (Martina)</strong>.</p>
+        <div class="baby-strip">
+          <div class="baby-icon">🍼</div>
+          <div class="baby-icon">🎀</div>
+          <div class="baby-icon">🎈</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="board">
+      <section class="left">
+        <div class="card">
+          <div class="hint">Instrucciones: Completa las pruebas en orden. Cada prueba desbloquea la siguiente. Cuando las 4 estén resueltas, pulsa <strong>Revelar</strong>.</div>
+
+          <!-- Puzzle 1: Adivinanza -->
+          <div class="puzzle" id="p1">
+            <h3>Prueba 1 — Adivinanza</h3>
+            <p>"Soy redondo como un balón, brillo de noche y cuido a la Tierra. ¿Qué soy?" <br><small>Introduce la palabra (minúsculas).</small></p>
+            <div class="controls">
+              <input id="p1input" type="text" placeholder="tu respuesta" />
+              <button class="btn" id="p1btn">Comprobar</button>
+              <div id="p1msg" style="color:#d24d6a"></div>
+            </div>
+            <p style="margin-top:10px;font-size:13px;color:var(--muted)">Si aciertas obtendrás un <span class="lock">código</span> para la siguiente prueba.</p>
+          </div>
+
+          <!-- Puzzle 2: Ordenar globos -->
+          <div class="puzzle" id="p2">
+            <h3>Prueba 2 — Ordena los globos</h3>
+            <p>Haz clic en los globos para colocarlos en el orden correcto. Orden objetivo: <em>amarillo - verde - azul - rosa</em>.</p>
+            <div class="balloons" id="balloonRow">
+              <div class="balloon pink">R</div>
+              <div class="balloon blue">A</div>
+              <div class="balloon yellow">M</div>
+              <div class="balloon green">I</div>
+            </div>
+            <div style="margin-top:10px"><button class="btn secondary" id="p2check">Comprobar orden</button> <span id="p2msg"></span></div>
+          </div>
+
+          <!-- Puzzle 3: Descifra -> ahora claro: 'bebe' -->
+          <div class="puzzle" id="p3">
+            <h3>Prueba 3 — Descifra</h3>
+            <p>Texto cifrado (César, desplazamiento +6): <code id="cipher">hklk</code>. Introduce la palabra descifrada. Pista: palabra clara relacionada con el tema.</p>
+            <div class="controls">
+              <input id="p3input" type="text" placeholder="palabra descifrada" />
+              <button class="btn" id="p3btn">Comprobar</button>
+              <div id="p3msg" style="color:#d24d6a"></div>
+            </div>
+          </div>
+
+          <!-- Puzzle 4: Palabra AMOR -->
+          <div class="puzzle" id="p4">
+            <h3>Prueba 4 — Letras mezcladas</h3>
+            <p>Forma la palabra final de 4 letras que representa cariño: <strong>AMOR</strong>. Haz clic en las piezas para cambiar su orden hasta lograr la palabra.</p>
+            <div class="sliderRow" id="pieces" style="margin-top:10px">
+              <div class="piece" data-letter="A">A</div>
+              <div class="piece" data-letter="M">M</div>
+              <div class="piece" data-letter="O">O</div>
+              <div class="piece" data-letter="R">R</div>
+            </div>
+            <div style="margin-top:10px"><button class="btn" id="p4check">Comprobar palabra</button> <span id="p4msg"></span></div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;gap:8px;align-items:center">
+            <div style="flex:1"><strong>Progreso:</strong> <span id="progress">0/4</span></div>
+            <button class="btn" id="revealBtn">Revelar</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right">
+        <div class="card">
+          <h3>Panel</h3>
+          <p><strong>Estado pruebas</strong></p>
+          <ul id="statusList" style="padding-left:18px;margin-top:8px">
+            <li>Prueba 1: <span id="s1">Pendiente</span></li>
+            <li>Prueba 2: <span id="s2">Bloqueada</span></li>
+            <li>Prueba 3: <span id="s3">Bloqueada</span></li>
+            <li>Prueba 4: <span id="s4">Bloqueada</span></li>
+          </ul>
+
+          <hr style="opacity:0.06;margin:12px 0" />
+          <div class="reveal" id="finalCard">
+            <h2>¡Casi listo!</h2>
+            <p>Cuando completes todo, pulsa <strong>Revelar</strong> para descubrir el sexo y el nombre.</p>
+            <div id="revealArea" style="margin-top:8px"></div>
+          </div>
+        </div>
+
+        <div style="height:18px"></div>
+        <div class="card" style="text-align:center">
+          <p style="margin:6px 0">Decoración y detalles:</p>
+          <div class="decor-row">
+            <div class="lock">👶 Oliver</div>
+            <div class="lock">👧 Martina</div>
+            <div class="lock">🎈 Pastel</div>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+    <footer>
+      <small>Archivo HTML listo para guardar y abrir en cualquier navegador. Puedes personalizar colores, textos o el enlace de vídeo final.</small>
+    </footer>
+  </div>
+
+  <script>
+    // ---------- CONFIGURACIÓN ----------
+    const REVEAL_NAME = 'Oliver'; // 'Oliver' o 'Martina'
+    const REVEAL_GENDER = (REVEAL_NAME.toLowerCase() === 'oliver') ? 'niño' : 'niña';
+    // Si quieres que al revelar abra un vídeo de YouTube, pega aquí la URL (ej. 'https://youtu.be/XXXXX')
+    const REVEAL_VIDEO_URL = 'https://www.youtube.com/watch?v=h96Jc7M11i4&list=RDh96Jc7M11i4&start_radio=1'; // deja vacío hasta que subas el vídeo
+    // -----------------------------------
+
+    const state = {p1:false,p2:false,p3:false,p4:false};
+    function updateProgress(){
+      const done = Object.values(state).filter(Boolean).length;
+      document.getElementById('progress').textContent = done + '/4';
+      document.getElementById('s1').textContent = state.p1? 'Resuelta' : 'Pendiente';
+      document.getElementById('s2').textContent = state.p2? 'Resuelta' : (state.p1? 'Desbloqueada' : 'Bloqueada');
+      document.getElementById('s3').textContent = state.p3? 'Resuelta' : (state.p2? 'Desbloqueada' : 'Bloqueada');
+      document.getElementById('s4').textContent = state.p4? 'Resuelta' : (state.p3? 'Desbloqueada' : 'Bloqueada');
+    }
+    updateProgress();
+
+    // P1: respuesta 'luna'
+    document.getElementById('p1btn').addEventListener('click',()=>{
+      const val = document.getElementById('p1input').value.trim().toLowerCase();
+      const msg = document.getElementById('p1msg');
+      if(val === 'luna'){
+        msg.style.color = '#2b8a6f'; msg.textContent = '¡Correcto! Tu código es 2419.';
+        state.p1 = true; updateProgress();
+      } else { msg.style.color='#d24d6a'; msg.textContent='No es correcto. Intenta otra vez.' }
+    });
+
+    // P2: globos
+    const balloonRow = document.getElementById('balloonRow');
+    function rotateBalloon(e){
+      if(!state.p1){ alert('Primero resuelve la Prueba 1.'); return; }
+      const node = e.currentTarget;
+      balloonRow.appendChild(node);
+    }
+    document.querySelectorAll('.balloon').forEach(b=>b.addEventListener('click',rotateBalloon));
+    document.getElementById('p2check').addEventListener('click',()=>{
+      if(!state.p1){ alert('Prueba 2 bloqueada. Resuelve la anterior.'); return; }
+      const colors = Array.from(balloonRow.children).map(n=>n.classList.contains('yellow')?'yellow':n.classList.contains('green')?'green':n.classList.contains('blue')?'blue':'pink');
+      const ok = colors.join(',') === 'yellow,green,blue,pink';
+      const msg = document.getElementById('p2msg');
+      if(ok){ state.p2=true; updateProgress(); msg.style.color='#2b8a6f'; msg.textContent='Orden correcto. Código: 86.' } else { msg.style.color='#d24d6a'; msg.textContent='Orden incorrecto. Intenta mover los globos.' }
+    });
+
+    // P3: César +6 -> queremos la palabra clara 'bebe'
+    // Para mostrar el cifrado, ciframos 'bebe' con +6 -> 'hkhk'
+    document.getElementById('cipher').textContent = 'hkhk';
+    document.getElementById('p3btn').addEventListener('click',()=>{
+      if(!state.p2){ alert('Primero termina la Prueba 2.'); return; }
+      const input = document.getElementById('p3input').value.trim().toLowerCase();
+      const plain = 'bebe';
+      const msg = document.getElementById('p3msg');
+      if(input === plain){ state.p3=true; updateProgress(); msg.style.color='#2b8a6f'; msg.textContent='¡Correcto! Has descifrado: ' + plain; }
+      else { msg.style.color='#d24d6a'; msg.textContent='Incorrecto. Pista: palabra relacionada con el tema (4 letras).' }
+    });
+
+    // P4: AMOR
+    const pieces = document.getElementById('pieces');
+    pieces.addEventListener('click',(e)=>{
+      const target = e.target.closest('.piece');
+      if(!target) return;
+      if(!state.p3){ alert('Primero resuelve la Prueba 3.'); return; }
+      pieces.appendChild(target);
+    });
+    document.getElementById('p4check').addEventListener('click',()=>{
+      if(!state.p3){ alert('Prueba 4 bloqueada. Resuelve la anterior.'); return; }
+      const word = Array.from(pieces.children).map(n=>n.dataset.letter).join('');
+      const ok = word.toUpperCase() === 'AMOR';
+      const msg = document.getElementById('p4msg');
+      if(ok){ state.p4=true; updateProgress(); msg.style.color='#2b8a6f'; msg.textContent='¡Palabra correcta! Listo para revelar.' }
+      else { msg.style.color='#d24d6a'; msg.textContent='No coincide. Prueba a cambiar el orden.' }
+    });
+
+    // Reveal
+    document.getElementById('revealBtn').addEventListener('click',()=>{
+      const all = Object.values(state).every(Boolean);
+      if(!all){ alert('Aún faltan pruebas. Completa las 4 pruebas para revelar.'); return; }
+      showReveal();
+    });
+
+    function showReveal(){
+  // Lanzar confeti blanco
+  launchConfetti('#ffffff');
+
+  // Solo abrir el vídeo, sin mostrar texto
+  if(REVEAL_VIDEO_URL && REVEAL_VIDEO_URL.trim().length>0){
+    window.open(REVEAL_VIDEO_URL,'_blank');
+  }
+}
+
+// Simple confetti generator
+    function launchConfetti(color){
+      const container = document.getElementById('confetti');
+      container.innerHTML='';
+      for(let i=0;i<100;i++){
+        const el = document.createElement('div');
+        el.style.position='absolute';
+        el.style.left = Math.random()*100 + '%';
+        el.style.top = (Math.random()*20) + '%';
+        el.style.width = (6+Math.random()*8)+'px';
+        el.style.height = (8+Math.random()*10)+'px';
+        el.style.opacity = 0.95;
+        el.style.background = color;
+        el.style.transform = 'rotate('+Math.random()*360+'deg)';
+        el.style.borderRadius = '2px';
+        el.style.animation = 'fall '+(3+Math.random()*3)+'s linear forwards';
+        container.appendChild(el);
+      }
+      const style = document.createElement('style');
+      style.textContent = `@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}`;
+      document.head.appendChild(style);
+    }
+
+  </script>
+</body>
+</html>
